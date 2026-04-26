@@ -7,6 +7,8 @@ export default function CreateLineup() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
+  const [loading, setLoading] = useState(false);
+  const [songsList, setSongsList] = useState([]);
 
   const [formData, setFormData] = useState({
     date: '',
@@ -24,19 +26,34 @@ export default function CreateLineup() {
     generalNotes: ''
   });
 
-  const songs = getSongs();
-
   useEffect(() => {
-    if (isEdit && id) {
-      const lineup = getLineupById(id);
-      if (lineup) {
-        setFormData(lineup);
+    async function loadData() {
+      try {
+        const songsData = await getSongs();
+        setSongsList(songsData);
+        
+        if (isEdit && id) {
+          const lineup = await getLineupById(id);
+          if (lineup) {
+            setFormData({
+              date: lineup.date || '',
+              serviceTime: lineup.service_time || '9:00 AM',
+              worshipLeader: lineup.worship_leader || '',
+              songs: lineup.songs || [],
+              musicians: lineup.musicians || {},
+              generalNotes: lineup.general_notes || ''
+            });
+          }
+        } else {
+          // Set default date to next Sunday
+          const nextSunday = getNextSunday();
+          setFormData(prev => ({ ...prev, date: nextSunday }));
+        }
+      } catch (err) {
+        console.error('Error loading data:', err);
       }
-    } else {
-      // Set default date to next Sunday
-      const nextSunday = getNextSunday();
-      setFormData(prev => ({ ...prev, date: nextSunday }));
     }
+    loadData();
   }, [id, isEdit]);
 
   const getNextSunday = () => {
@@ -62,14 +79,14 @@ export default function CreateLineup() {
   };
 
   const handleAddSong = (songId) => {
-    const song = songs.find(s => s.id === songId);
+    const song = songsList.find(s => s.id === songId);
     if (song && !formData.songs.find(s => s.songId === songId)) {
       setFormData(prev => ({
         ...prev,
         songs: [...prev.songs, {
           songId: song.id,
           title: song.title,
-          selectedKey: song.selectedKey || song.originalKey,
+          selectedKey: song.selected_key || song.original_key,
           order: prev.songs.length + 1,
           notes: ''
         }]
@@ -114,19 +131,27 @@ export default function CreateLineup() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     
-    const lineupData = {
-      ...formData,
-      id: isEdit ? id : undefined
-    };
-    
-    saveLineup(lineupData);
-    navigate('/lineup');
+    try {
+      const lineupData = {
+        ...formData,
+        id: isEdit ? id : undefined
+      };
+      
+      await saveLineup(lineupData);
+      navigate('/lineup');
+    } catch (err) {
+      console.error('Error saving lineup:', err);
+      alert('Error saving lineup. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const availableSongs = songs.filter(s => !formData.songs.find(ls => ls.songId === s.id));
+  const availableSongs = songsList.filter(s => !formData.songs.find(ls => ls.songId === s.id));
   const keys = ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'];
 
   return (

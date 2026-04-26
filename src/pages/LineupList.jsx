@@ -1,17 +1,37 @@
 // filepath: src/pages/LineupList.jsx
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getLineups, deleteLineup } from '../utils/storage';
 
 export default function LineupList() {
-  const lineups = getLineups();
-  
+  const [lineups, setLineups] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadLineups() {
+      try {
+        const data = await getLineups();
+        setLineups(data);
+      } catch (err) {
+        console.error('Error loading lineups:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadLineups();
+  }, []);
+
   // Sort by date, upcoming first
   const sortedLineups = [...lineups].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  const handleDelete = (id, date) => {
+  const handleDelete = async (id, date) => {
     if (confirm(`Are you sure you want to delete the lineup for ${new Date(date).toLocaleDateString()}?`)) {
-      deleteLineup(id);
-      window.location.reload();
+      try {
+        await deleteLineup(id);
+        setLineups(lineups.filter(l => l.id !== id));
+      } catch (err) {
+        console.error('Error deleting lineup:', err);
+      }
     }
   };
 
@@ -24,6 +44,16 @@ export default function LineupList() {
       year: 'numeric'
     });
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -53,11 +83,11 @@ export default function LineupList() {
                       {formatDate(lineup.date)}
                     </h3>
                     <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded text-sm">
-                      {lineup.serviceTime}
+                      {lineup.service_time}
                     </span>
                   </div>
                   <p className="text-gray-500 dark:text-gray-400 mb-2">
-                    <strong>Worship Leader:</strong> {lineup.worshipLeader || 'Not assigned'}
+                    <strong>Worship Leader:</strong> {lineup.worship_leader || 'Not assigned'}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {lineup.songs?.slice(0, 3).map((song, index) => (

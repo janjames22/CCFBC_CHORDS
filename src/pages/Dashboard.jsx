@@ -1,11 +1,42 @@
 // filepath: src/pages/Dashboard.jsx
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getSongs, getUpcomingLineup } from '../utils/storage';
 
 export default function Dashboard() {
-  const songs = getSongs();
-  const upcomingLineup = getUpcomingLineup();
+  const [songs, setSongs] = useState([]);
+  const [upcomingLineup, setUpcomingLineup] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [songsData, lineupData] = await Promise.all([
+          getSongs(),
+          getUpcomingLineup()
+        ]);
+        setSongs(songsData);
+        setUpcomingLineup(lineupData);
+      } catch (err) {
+        console.error('Error loading dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
   const recentSongs = songs.slice(-5).reverse();
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -52,17 +83,17 @@ export default function Dashboard() {
                 <strong>Date:</strong> {new Date(upcomingLineup.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
               <p className="text-gray-600 dark:text-gray-400">
-                <strong>Time:</strong> {upcomingLineup.serviceTime}
+                <strong>Time:</strong> {upcomingLineup.service_time}
               </p>
               <p className="text-gray-600 dark:text-gray-400">
-                <strong>Worship Leader:</strong> {upcomingLineup.worshipLeader || 'Not assigned'}
+                <strong>Worship Leader:</strong> {upcomingLineup.worship_leader || 'Not assigned'}
               </p>
               <div className="mt-4">
                 <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Songs:</h4>
                 <ol className="list-decimal list-inside space-y-1">
                   {upcomingLineup.songs?.map((song, index) => (
                     <li key={index} className="text-gray-600 dark:text-gray-400">
-                      {song.title} <span className="text-indigo-600">({song.selectedKey})</span>
+                      {song.title} <span className="text-indigo-600">({song.selected_key || song.original_key})</span>
                     </li>
                   ))}
                 </ol>
@@ -97,7 +128,7 @@ export default function Dashboard() {
                       {song.title}
                     </span>
                     <span className="text-sm text-indigo-600 dark:text-indigo-400">
-                      {song.selectedKey || song.originalKey}
+                      {song.selected_key || song.original_key}
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">

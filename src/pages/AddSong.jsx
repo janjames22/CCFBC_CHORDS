@@ -7,6 +7,7 @@ export default function AddSong() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -21,12 +22,25 @@ export default function AddSong() {
   });
 
   useEffect(() => {
-    if (isEdit && id) {
-      const song = getSongById(id);
-      if (song) {
-        setFormData(song);
+    async function loadSong() {
+      if (isEdit && id) {
+        const song = await getSongById(id);
+        if (song) {
+          setFormData({
+            title: song.title || '',
+            artist: song.artist || '',
+            originalKey: song.original_key || 'C',
+            selectedKey: song.selected_key || song.original_key || 'C',
+            tempo: song.tempo || '',
+            category: song.category || 'Worship',
+            language: song.language || '',
+            chordChart: song.chord_chart || '',
+            notes: song.notes || ''
+          });
+        }
       }
     }
+    loadSong();
   }, [id, isEdit]);
 
   const keys = ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'];
@@ -39,17 +53,25 @@ export default function AddSong() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     
-    const songData = {
-      ...formData,
-      id: isEdit ? id : undefined,
-      selectedKey: formData.selectedKey || formData.originalKey
-    };
-    
-    saveSong(songData);
-    navigate('/songs');
+    try {
+      const songData = {
+        ...formData,
+        id: isEdit ? id : undefined,
+        selectedKey: formData.selectedKey || formData.originalKey
+      };
+      
+      await saveSong(songData);
+      navigate('/songs');
+    } catch (err) {
+      console.error('Error saving song:', err);
+      alert('Error saving song. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

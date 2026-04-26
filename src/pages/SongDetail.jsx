@@ -8,21 +8,34 @@ export default function SongDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [song, setSong] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [transposeAmount, setTransposeAmount] = useState(0);
 
   useEffect(() => {
-    if (id) {
-      const foundSong = getSongById(id);
-      if (foundSong) {
-        setSong(foundSong);
-        // Calculate transpose amount from original to selected key
-        const keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        const originalIndex = keys.indexOf(foundSong.originalKey);
-        const selectedIndex = keys.indexOf(foundSong.selectedKey || foundSong.originalKey);
-        setTransposeAmount(selectedIndex - originalIndex);
+    async function loadSong() {
+      if (id) {
+        const foundSong = await getSongById(id);
+        if (foundSong) {
+          setSong(foundSong);
+          // Calculate transpose amount from original to selected key
+          const keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+          const originalIndex = keys.indexOf(foundSong.original_key);
+          const selectedIndex = keys.indexOf(foundSong.selected_key || foundSong.original_key);
+          setTransposeAmount(selectedIndex - originalIndex);
+        }
       }
+      setLoading(false);
     }
+    loadSong();
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
 
   if (!song) {
     return (
@@ -44,8 +57,8 @@ export default function SongDetail() {
     setTransposeAmount(0);
   };
 
-  const currentKey = getTransposedKey(song.originalKey, transposeAmount);
-  const transposedChords = transposeChords(song.chordChart || '', transposeAmount);
+  const currentKey = getTransposedKey(song.original_key, transposeAmount);
+  const transposedChords = transposeChords(song.chord_chart || '', transposeAmount);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -75,7 +88,7 @@ export default function SongDetail() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">Original Key</span>
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">{song.originalKey}</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">{song.original_key}</p>
           </div>
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">Current Key</span>

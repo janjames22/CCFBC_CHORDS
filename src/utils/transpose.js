@@ -66,6 +66,19 @@ function transposeChord(chord, semitones) {
   return newChord;
 }
 
+// Check if a line is primarily chords (no lyrics or very few letters)
+function isChordLine(line) {
+  // Remove section headers first
+  const cleanLine = line.replace(/^(Intro|Verse|Pre-Chorus|Chorus|Bridge|Instrumental|Ending|Tag|Outro|Interlude|Pre-Ver|Chorus 2|Bridge 2|Final Chorus):?\s*/i, '');
+  
+  // Count letters (lyrics) vs chords
+  const letters = (cleanLine.match(/[a-zA-Z]/g) || []).length;
+  const chords = (cleanLine.match(/[A-G][b#]?(?:m|maj|min|sus|add|dim|aug|\d+|ø)?/gi) || []).length;
+  
+  // If line has very few letters compared to chords, it's likely a chord line
+  return letters < 3 && chords > 0;
+}
+
 // Main transpose function
 export function transposeChords(chordChart, semitones) {
   if (!chordChart || semitones === 0) return chordChart;
@@ -73,14 +86,26 @@ export function transposeChords(chordChart, semitones) {
   // Split into lines and process each
   const lines = chordChart.split('\n');
   const transposedLines = lines.map(line => {
-    // Skip section headers like "Verse:", "Chorus:", etc.
+    // Skip empty lines
+    if (!line.trim()) return line;
+    
+    // Skip section headers like "Verse:", "Chorus:", etc. (but not the chord line after)
     if (/^(Intro|Verse|Pre-Chorus|Chorus|Bridge|Instrumental|Ending|Tag|Outro):?\s*$/i.test(line)) {
       return line;
     }
     
-    // Find all chords in the line
-    // Chord pattern: uppercase letter optionally followed by # or b, then quality, optionally with bass
-    const chordPattern = /([A-G](?:b|#)?(?:m|maj|min|sus|add|dim|aug|\d+)*(?:\/\w+)?)/g;
+    // Check if this is a chord-only line (chords above lyrics format)
+    if (isChordLine(line)) {
+      // For chord lines, transpose all chords
+      const chordPattern = /([A-G](?:b|#)?(?:m|maj|min|sus|add|dim|aug|ø|\d+)*(?:\/[A-G][b#]?)?)/gi;
+      return line.replace(chordPattern, (match) => {
+        return transposeChord(match, semitones);
+      });
+    }
+    
+    // For mixed lines (chords inline with lyrics), transpose only the chord parts
+    // This preserves lyrics while transposing chords
+    const chordPattern = /([A-G](?:b|#)?(?:m|maj|min|sus|add|dim|aug|ø|\d+)*(?:\/[A-G][b#]?)?)/gi;
     
     return line.replace(chordPattern, (match) => {
       return transposeChord(match, semitones);

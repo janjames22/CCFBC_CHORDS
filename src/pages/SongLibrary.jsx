@@ -1,13 +1,28 @@
 // filepath: src/pages/SongLibrary.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getSongs, deleteSong } from '../utils/storage';
 
 export default function SongLibrary() {
-  const songs = getSongs();
+  const [songs, setSongs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterKey, setFilterKey] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+
+  useEffect(() => {
+    async function loadSongs() {
+      try {
+        const data = await getSongs();
+        setSongs(data);
+      } catch (err) {
+        console.error('Error loading songs:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadSongs();
+  }, []);
 
   const keys = ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'];
   const categories = ['Worship', 'Praise', 'Filipino', 'Hymn', 'Contemporary', 'Other'];
@@ -15,17 +30,31 @@ export default function SongLibrary() {
   const filteredSongs = songs.filter(song => {
     const matchesSearch = song.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          song.artist.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesKey = !filterKey || song.originalKey === filterKey || song.selectedKey === filterKey;
+    const matchesKey = !filterKey || song.original_key === filterKey || song.selected_key === filterKey;
     const matchesCategory = !filterCategory || song.category === filterCategory;
     return matchesSearch && matchesKey && matchesCategory;
   });
 
-  const handleDelete = (id, title) => {
+  const handleDelete = async (id, title) => {
     if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      deleteSong(id);
-      window.location.reload();
+      try {
+        await deleteSong(id);
+        setSongs(songs.filter(s => s.id !== id));
+      } catch (err) {
+        console.error('Error deleting song:', err);
+      }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -110,7 +139,7 @@ export default function SongLibrary() {
                   {song.title}
                 </h3>
                 <span className="px-2 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded text-sm font-medium">
-                  {song.selectedKey || song.originalKey}
+                  {song.selected_key || song.original_key}
                 </span>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">

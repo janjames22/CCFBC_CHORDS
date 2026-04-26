@@ -8,32 +8,41 @@ export default function LineupView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [lineup, setLineup] = useState(null);
+  const [allSongs, setAllSongs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [transposeAmount, setTransposeAmount] = useState(0);
   const [showChords, setShowChords] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      const foundLineup = getLineupById(id);
-      if (foundLineup) {
-        setLineup(foundLineup);
+    async function loadData() {
+      try {
+        const [lineupData, songsData] = await Promise.all([
+          id ? getLineupById(id) : Promise.resolve(null),
+          getSongs()
+        ]);
+        
+        if (lineupData) {
+          setLineup(lineupData);
+        }
+        setAllSongs(songsData);
+      } catch (err) {
+        console.error('Error loading data:', err);
+      } finally {
+        setLoading(false);
       }
     }
+    loadData();
   }, [id]);
 
-  if (!lineup) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <p className="text-gray-500">Lineup not found.</p>
-        <Link to="/lineup" className="text-indigo-600 hover:text-indigo-800">
-          Back to Lineups
-        </Link>
-      </div>
-    );
-  }
+  const getSongChords = (song) => {
+    const songData = allSongs.find(s => s.id === song.songId || s.title === song.title);
+    if (!songData) return '';
+    return transposeChords(songData.chord_chart || songData.chordChart || '', transposeAmount);
+  };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm('Are you sure you want to delete this lineup?')) {
-      deleteLineup(id);
+      await deleteLineup(id);
       navigate('/lineup');
     }
   };
@@ -46,13 +55,6 @@ export default function LineupView() {
     setTransposeAmount(0);
   };
 
-  const getSongChords = (song) => {
-    const songs = getSongs();
-    const songData = songs.find(s => s.id === song.songId || s.title === song.title);
-    if (!songData) return '';
-    return transposeChords(songData.chordChart || '', transposeAmount);
-  };
-
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('en-US', { 
@@ -62,6 +64,25 @@ export default function LineupView() {
       day: 'numeric' 
     });
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!lineup) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <p className="text-gray-500">Lineup not found.</p>
+        <Link to="/lineup" className="text-indigo-600 hover:text-indigo-800">
+          Back to Lineups
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -75,7 +96,7 @@ export default function LineupView() {
             Sunday Lineup
           </h1>
           <p className="text-lg text-gray-500 dark:text-gray-400">
-            {formatDate(lineup.date)} • {lineup.serviceTime}
+            {formatDate(lineup.date)} • {lineup.service_time}
           </p>
         </div>
         <div className="flex gap-2">
@@ -103,11 +124,11 @@ export default function LineupView() {
           </div>
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">Service Time</span>
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">{lineup.serviceTime}</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">{lineup.service_time}</p>
           </div>
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">Worship Leader</span>
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">{lineup.worshipLeader || '-'}</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">{lineup.worship_leader || '-'}</p>
           </div>
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">Songs</span>
