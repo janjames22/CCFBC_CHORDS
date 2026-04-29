@@ -41,17 +41,17 @@ export default function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-        Welcome to Worship Chords
+        Welcome to Praise and Worship Chords
       </h1>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Link
           to="/songs/add"
-          className="p-6 bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+          className="p-6 bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition-colors"
         >
           <h3 className="text-lg font-semibold text-white">➕ Add Song</h3>
-          <p className="text-indigo-200 mt-1">Add a new song to the library</p>
+          <p className="text-blue-200 mt-1">Add a new song to the library</p>
         </Link>
         
         <Link
@@ -59,7 +59,7 @@ export default function Dashboard() {
           className="p-6 bg-green-600 rounded-lg shadow-md hover:bg-green-700 transition-colors"
         >
           <h3 className="text-lg font-semibold text-white">📋 Create Lineup</h3>
-          <p className="text-green-200 mt-1">Plan this Sunday's service</p>
+          <p className="text-blue-200 mt-1">Plan this Sunday's service</p>
         </Link>
         
         <Link
@@ -100,7 +100,7 @@ export default function Dashboard() {
               </div>
               <Link
                 to={`/lineup/${upcomingLineup.id}`}
-                className="inline-block mt-4 text-indigo-600 hover:text-indigo-800"
+                className="inline-block mt-4 text-blue-600 hover:text-blue-800"
               >
                 View Full Lineup →
               </Link>
@@ -127,7 +127,7 @@ export default function Dashboard() {
                     <span className="font-medium text-gray-900 dark:text-white">
                       {song.title}
                     </span>
-                    <span className="text-sm text-indigo-600 dark:text-indigo-400">
+                    <span className="text-sm text-blue-600 dark:text-blue-400">
                       {song.selected_key || song.original_key}
                     </span>
                   </div>
@@ -152,7 +152,7 @@ export default function Dashboard() {
       {/* Stats */}
       <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center">
-          <div className="text-3xl font-bold text-indigo-600">{songs.length}</div>
+          <div className="text-3xl font-bold text-blue-600">{songs.length}</div>
           <div className="text-sm text-gray-500">Total Songs</div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 text-center">

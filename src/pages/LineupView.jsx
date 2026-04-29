@@ -77,7 +77,7 @@ export default function LineupView() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <p className="text-gray-500">Lineup not found.</p>
-        <Link to="/lineup" className="text-indigo-600 hover:text-indigo-800">
+        <Link to="/lineup" className="text-blue-600 hover:text-blue-800">
           Back to Lineups
         </Link>
       </div>
@@ -89,7 +89,7 @@ export default function LineupView() {
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
-          <Link to="/lineup" className="text-indigo-600 hover:text-indigo-800 text-sm">
+          <Link to="/lineup" className="text-blue-600 hover:text-blue-800 text-sm">
             ← Back to Lineups
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
@@ -162,7 +162,7 @@ export default function LineupView() {
           </button>
           <button
             onClick={handleReset}
-            className="ml-4 px-4 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors"
+            className="ml-4 px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
           >
             Reset
           </button>
@@ -181,12 +181,12 @@ export default function LineupView() {
           <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <span className="text-2xl font-bold text-indigo-600">{index + 1}.</span>
+                <span className="text-2xl font-bold text-blue-600">{index + 1}.</span>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {song.title}
                   </h3>
-                  <span className="text-lg text-indigo-600 font-medium">
+                  <span className="text-lg text-blue-600 font-medium">
                     Key: {getTransposedKey(song.selectedKey, transposeAmount)}
                   </span>
                 </div>
@@ -214,16 +214,60 @@ export default function LineupView() {
             Team Assignments
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {Object.entries(lineup.musicians).map(([role, name]) => (
-              name && (
-                <div key={role}>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 capitalize">
-                    {role.replace(/([A-Z])/g, ' $1').trim()}
-                  </span>
-                  <p className="font-medium text-gray-900 dark:text-white">{name}</p>
-                </div>
-              )
-            ))}
+            {lineup.musicians.keyboard && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase">Keyboard</span>
+                <p className="font-medium text-gray-900 dark:text-white mt-1">{lineup.musicians.keyboard}</p>
+              </div>
+            )}
+            {lineup.musicians.acoustic && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase">Acoustic Guitar</span>
+                <p className="font-medium text-gray-900 dark:text-white mt-1">{lineup.musicians.acoustic}</p>
+              </div>
+            )}
+            {lineup.musicians.electric && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase">Electric Guitar</span>
+                <p className="font-medium text-gray-900 dark:text-white mt-1">{lineup.musicians.electric}</p>
+              </div>
+            )}
+            {lineup.musicians.bass && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase">Bass</span>
+                <p className="font-medium text-gray-900 dark:text-white mt-1">{lineup.musicians.bass}</p>
+              </div>
+            )}
+            {lineup.musicians.drums && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase">Drums</span>
+                <p className="font-medium text-gray-900 dark:text-white mt-1">{lineup.musicians.drums}</p>
+              </div>
+            )}
+            {lineup.musicians.multimedia && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase">Multimedia</span>
+                <p className="font-medium text-gray-900 dark:text-white mt-1">{lineup.musicians.multimedia}</p>
+              </div>
+            )}
+            {lineup.musicians.vocals_1 && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase">Vocals 1</span>
+                <p className="font-medium text-gray-900 dark:text-white mt-1">{lineup.musicians.vocals_1}</p>
+              </div>
+            )}
+            {lineup.musicians.vocals_2 && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase">Vocals 2</span>
+                <p className="font-medium text-gray-900 dark:text-white mt-1">{lineup.musicians.vocals_2}</p>
+              </div>
+            )}
+            {lineup.musicians.vocals_3 && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase">Vocals 3</span>
+                <p className="font-medium text-gray-900 dark:text-white mt-1">{lineup.musicians.vocals_3}</p>
+              </div>
+            )}
           </div>
         </div>
       )}

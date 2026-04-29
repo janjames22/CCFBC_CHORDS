@@ -17,11 +17,14 @@ export default function CreateLineup() {
     songs: [],
     musicians: {
       keyboard: '',
-      acousticGuitar: '',
-      electricGuitar: '',
+      acoustic: '',
+      electric: '',
       bass: '',
       drums: '',
-      vocals: []
+      multimedia: '',
+      vocals_1: '',
+      vocals_2: '',
+      vocals_3: ''
     },
     generalNotes: ''
   });
@@ -234,7 +237,7 @@ export default function CreateLineup() {
                   const select = e.target.previousElementSibling;
                   if (select.value) handleAddSong(select.value);
                 }}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Add
               </button>
@@ -332,8 +335,8 @@ export default function CreateLineup() {
               </label>
               <input
                 type="text"
-                name="acousticGuitar"
-                value={formData.musicians.acousticGuitar}
+                name="acoustic"
+                value={formData.musicians.acoustic}
                 onChange={handleMusicianChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Name"
@@ -345,8 +348,8 @@ export default function CreateLineup() {
               </label>
               <input
                 type="text"
-                name="electricGuitar"
-                value={formData.musicians.electricGuitar}
+                name="electric"
+                value={formData.musicians.electric}
                 onChange={handleMusicianChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Name"
@@ -378,6 +381,58 @@ export default function CreateLineup() {
                 placeholder="Name"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Multimedia
+              </label>
+              <input
+                type="text"
+                name="multimedia"
+                value={formData.musicians.multimedia}
+                onChange={handleMusicianChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="Name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Vocals 1
+              </label>
+              <input
+                type="text"
+                name="vocals_1"
+                value={formData.musicians.vocals_1}
+                onChange={handleMusicianChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="Name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Vocals 2
+              </label>
+              <input
+                type="text"
+                name="vocals_2"
+                value={formData.musicians.vocals_2}
+                onChange={handleMusicianChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="Name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Vocals 3
+              </label>
+              <input
+                type="text"
+                name="vocals_3"
+                value={formData.musicians.vocals_3}
+                onChange={handleMusicianChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="Name"
+              />
+            </div>
           </div>
         </div>
 
@@ -398,7 +453,7 @@ export default function CreateLineup() {
         <div className="flex gap-4">
           <button
             type="submit"
-            className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+            className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
           >
             {isEdit ? 'Update Lineup' : 'Create Lineup'}
           </button>

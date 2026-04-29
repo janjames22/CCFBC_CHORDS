@@ -10,6 +10,19 @@ export default function SongDetail() {
   const [song, setSong] = useState(null);
   const [loading, setLoading] = useState(true);
   const [transposeAmount, setTransposeAmount] = useState(0);
+  const [lyricsSection, setLyricsSection] = useState('all');
+
+  const SECTION_TYPES = [
+    'Intro',
+    'Verse 1',
+    'Verse 2',
+    'Verse 3',
+    'Pre-Chorus',
+    'Chorus',
+    'Bridge',
+    'Instrumental',
+    'Ending'
+  ];
 
   useEffect(() => {
     async function loadSong() {
@@ -41,7 +54,7 @@ export default function SongDetail() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <p className="text-gray-500">Song not found.</p>
-        <Link to="/songs" className="text-indigo-600 hover:text-indigo-800">
+        <Link to="/songs" className="text-blue-600 hover:text-blue-800">
           Back to Song Library
         </Link>
       </div>
@@ -60,12 +73,24 @@ export default function SongDetail() {
   const currentKey = getTransposedKey(song.original_key, transposeAmount);
   const transposedChords = transposeChords(song.chord_chart || '', transposeAmount);
 
+  const getLyricsText = () => {
+    if (lyricsSection === 'all') {
+      const sections = song.lyrics_sections?.map(s => s.text).filter(Boolean).join('\n\n');
+      return sections || song.lyrics || 'No lyrics available';
+    }
+    const section = song.lyrics_sections?.find(s => s.section === lyricsSection);
+    return section?.text || 'No lyrics for this section';
+  };
+
+  const hasLyrics = (song.lyrics && song.lyrics.length > 0) || 
+                    (song.lyrics_sections && song.lyrics_sections.length > 0);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
-          <Link to="/songs" className="text-indigo-600 hover:text-indigo-800 text-sm">
+          <Link to="/songs" className="text-blue-600 hover:text-blue-800 text-sm">
             ← Back to Songs
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
@@ -92,7 +117,7 @@ export default function SongDetail() {
           </div>
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">Current Key</span>
-            <p className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">{currentKey}</p>
+            <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">{currentKey}</p>
           </div>
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">Category</span>
@@ -128,7 +153,7 @@ export default function SongDetail() {
           </button>
           <button
             onClick={handleReset}
-            className="ml-4 px-4 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors"
+            className="ml-4 px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
           >
             Reset
           </button>
@@ -144,6 +169,39 @@ export default function SongDetail() {
 {transposedChords || 'No chord chart added yet.'}
         </pre>
       </div>
+
+      {/* Lyrics / Vocals Monitor */}
+      {hasLyrics && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mt-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Vocals Monitor / Lyrics
+          </h2>
+          
+          {/* Section Selector */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Select Section
+            </label>
+            <select
+              value={lyricsSection}
+              onChange={(e) => setLyricsSection(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option value="all">All Lyrics</option>
+              {SECTION_TYPES.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Lyrics Display */}
+          <div className="bg-slate-900 rounded-lg p-4">
+            <pre className="text-white text-lg leading-relaxed whitespace-pre-wrap font-medium">
+{getLyricsText()}
+            </pre>
+          </div>
+        </div>
+      )}
 
       {/* Notes */}
       {song.notes && (
@@ -161,7 +219,7 @@ export default function SongDetail() {
       <div className="mt-6 text-center">
         <Link
           to="/lineup/create"
-          className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           + Add to Sunday Lineup
         </Link>

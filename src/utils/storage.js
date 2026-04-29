@@ -29,6 +29,8 @@ export async function saveSong(song) {
       language: song.language || null,
       chord_chart: song.chordChart || null,
       notes: song.notes || null,
+      lyrics: song.lyrics || null,
+      lyrics_sections: song.lyricsSections || null,
       updated_at: new Date().toISOString()
     };
 
